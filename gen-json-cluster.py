@@ -22,6 +22,8 @@ import calendar
 import time
 
 from math import radians, cos, sin, asin, sqrt
+from sklearn.cluster import KMeans
+import numpy as np
 
 #### VARIABLES #########################################################
 from configobj import ConfigObj
@@ -118,9 +120,11 @@ array_list = []
 trackingInfo_reducido = []
 trackingInfo = getTracking()
 
-lat_anterior = 0
-lon_anterior = 0
+nclusters = 10
 ntrackings = 0
+lon_anterior =0
+lat_anterior =0
+
 
 for tracking in trackingInfo:
 	lat = tracking[0]
@@ -128,17 +132,28 @@ for tracking in trackingInfo:
 	speed = tracking[2]
 	heading = tracking[3]
 
-	distance = haversine(lon_anterior, lat_anterior, lon, lat)
-	if ( distance> 100):
-		trackingInfo_reducido.append([lat,lon,speed,heading])
-		ntrackings+=1
-	#else:
-		#print distance
+	if (lon_anterior == 0):
+		X = np.array([[lat, lon]])
+		print X
+	else:
+		X = np.append(X, [[lat,lon]], axis=0)
 
 	lon_anterior = lon
 	lat_anterior = lat
 
-print ntrackings
+#print X
+kmeans = KMeans(n_clusters=20)
+kmeans.fit(X)
+
+centroids = kmeans.cluster_centers_
+labels = kmeans.labels_
+
+#print centroids
+
+for i in centroids:
+	trackingInfo_reducido.append([i[0],i[1],0,0])
+
+#print ntrackings
 
 for tracking in trackingInfo_reducido:
 	position = {"geometry": {"type": "Point", "coordinates": [ tracking[1] , tracking[0] ]}, "type": "Feature", "properties":{"speed": tracking[2], "heading": tracking[3]}}
