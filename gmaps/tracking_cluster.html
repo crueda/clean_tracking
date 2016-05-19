@@ -69,25 +69,9 @@
 
 
             $.getJSON( "../tracking_cluster.json", function( data ) {
-                var lat_anterior = 0;
-                var lon_anterior = 0;
-                var lat = 0;
-                var lon = 0;
                 //var items = [];
                 $.each( data, function( key, val ) {
-                  add (val.geometry.coordinates[0],val.geometry.coordinates[1]);
-                  /*lon = val.geometry.coordinates[0];
-                  lat = val.geometry.coordinates[1];
-                  if (lon_anterior=0) {
-                    lon_anterior = lon;
-                  }
-                  if (lat_anterior=0) {
-                    lat_anterior = lat;
-                  }
-                  add (lon,lat);
-                  add_line (lon_anterior, lat_anterior, lon, lat)
-                  lon_anterior = lon;
-                  lat_anterior = lat;*/
+                  add (val.geometry.coordinates[0],val.geometry.coordinates[1],val.properties.speed);
              });                    
            });          
         }
@@ -114,13 +98,20 @@
        var dict_state = [];
        var marker = [];
        var car = null;
+
+
+
     </script>
 
 </head>
 <body>
     <div id="map_canvas"></div>
     <script>
-    function add(lon, lat) {
+
+      var lat_anterior = 0;
+      var lon_anterior = 0;
+
+    function add(lon, lat, size_cluster) {
         var myLatlng = new google.maps.LatLng(lat, lon);
         var image_src = getCarImage(); 
 
@@ -140,6 +131,27 @@
             draggable: false
         });
 
+                  if (lon_anterior==0) {
+                    lon_anterior = lon;
+                  }
+                  if (lat_anterior==0) {
+                    lat_anterior = lat;
+                  }
+                  //add_line (lon_anterior, lat_anterior, lon, lat)
+                  var cityCircle = new google.maps.Circle({
+                    strokeColor: '#FF0000',
+                    strokeOpacity: 0.8,
+                    strokeWeight: 2,
+                    fillColor: '#0000FF',
+                    fillOpacity: 0.35,
+                    map: map,
+                    center: myLatlng,
+                    radius: 100*size_cluster
+                  });
+
+                  lon_anterior = lon;
+                  lat_anterior = lat;
+
     }
 
     function add_line(lon1, lat1, lon2, lat2) {
@@ -151,7 +163,7 @@
         ],
         strokeColor: "#0000FF",
         strokeOpacity: 1.0,
-        strokeWeight: 6,
+        strokeWeight: 3,
         map: map
       });
     }

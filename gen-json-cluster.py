@@ -134,7 +134,7 @@ for tracking in trackingInfo:
 
 	if (lon_anterior == 0):
 		X = np.array([[lat, lon]])
-		print X
+		#print X
 	else:
 		X = np.append(X, [[lat,lon]], axis=0)
 
@@ -147,11 +147,15 @@ kmeans.fit(X)
 
 centroids = kmeans.cluster_centers_
 labels = kmeans.labels_
+size_clusters = np.bincount(labels)
 
 #print centroids
+#print size_clusters
 
+j = 0
 for i in centroids:
-	trackingInfo_reducido.append([i[0],i[1],0,0])
+	trackingInfo_reducido.append([i[0],i[1],size_clusters[j],0])
+	j+=1
 
 #print ntrackings
 

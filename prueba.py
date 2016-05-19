@@ -25,7 +25,10 @@ kmeans.fit(X)
 centroids = kmeans.cluster_centers_
 labels = kmeans.labels_
 
+print "Centroides:"
 print(centroids)
+print "Tamanyo de los clusters:"
+print np.bincount(labels)
 print ("-------------")
 '''
 #grafico para cluster = 2
