@@ -97,10 +97,14 @@ def getTracking():
 
 array_list = []
 trackingInfo = getTracking()
+ntrackings = 0
 
 for tracking in trackingInfo:
 	position = {"geometry": {"type": "Point", "coordinates": [ tracking[1] , tracking[0] ]}, "type": "Feature", "properties":{"speed": tracking[2], "heading": tracking[3]}}
 	array_list.append(position)
+	ntrackings+=1
+
+print ntrackings
 
 with open('./tracking.json', 'w') as outfile:
 	json.dump(array_list, outfile)

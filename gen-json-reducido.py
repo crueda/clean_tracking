@@ -21,6 +21,8 @@ import datetime
 import calendar
 import time
 
+from math import radians, cos, sin, asin, sqrt
+
 #### VARIABLES #########################################################
 from configobj import ConfigObj
 config = ConfigObj('./gen-json.properties')
@@ -37,6 +39,7 @@ MYSQL_PASSWORD = config['mysql_passwd']
 DEVICE_ID = config['device_id']
 INIT_DATE = config['init_date']
 END_DATE = config['end_date']
+FILTER_DISTANCE = config['filter_distance']
 
 from json import encoder
 encoder.FLOAT_REPR = lambda o: format(o, '.4f')
@@ -60,6 +63,22 @@ except:
 ########################################################################
 
 ########################################################################
+
+def haversine(lon1, lat1, lon2, lat2):
+    """
+    Calculate the great circle distance between two points 
+    on the earth (specified in decimal degrees)
+    """
+    # convert decimal degrees to radians 
+    lon1, lat1, lon2, lat2 = map(radians, [lon1, lat1, lon2, lat2])
+
+    # haversine formula 
+    dlon = lon2 - lon1 
+    dlat = lat2 - lat1 
+    a = sin(dlat/2)**2 + cos(lat1) * cos(lat2) * sin(dlon/2)**2
+    c = 2 * asin(sqrt(a)) 
+    r = 6371 # Radius of earth in kilometers. Use 3956 for miles
+    return c * r * 1000
 
 def getUTC():
 	t = calendar.timegm(datetime.datetime.utcnow().utctimetuple())
@@ -99,16 +118,45 @@ array_list = []
 trackingInfo_reducido = []
 trackingInfo = getTracking()
 
+lat_anterior = 0
+lon_anterior = 0
+ntrackings = 0
+time_anterior = 0
 for tracking in trackingInfo:
 	lat = tracking[0]
 	lon = tracking[1]
 	speed = tracking[2]
 	heading = tracking[3]
-	trackingInfo_reducido.append([lat,lon,speed,heading])
+	time = tracking[4]
+
+	if (lat_anterior == 0):
+		lat_anterior = lat
+		lon_anterior = lon
+		time_anterior = time
+		trackingInfo_reducido.append([lat,lon,speed,heading])
+
+	distance = haversine(lon_anterior, lat_anterior, lon, lat)
+	diff_time =  (time - time_anterior) / 1000
+	#print diff_time
+
+	if ( diff_time> 900):
+	#if ( distance> 100):
+		trackingInfo_reducido.append([lat,lon,speed,heading])
+		ntrackings+=1
+
+		lon_anterior = lon
+		lat_anterior = lat
+		time_anterior = time
+
+	#else:
+		#print distance
+
+
+print ntrackings
 
 for tracking in trackingInfo_reducido:
 	position = {"geometry": {"type": "Point", "coordinates": [ tracking[1] , tracking[0] ]}, "type": "Feature", "properties":{"speed": tracking[2], "heading": tracking[3]}}
 	array_list.append(position)
 
-with open('./tracking_reducido.json', 'w') as outfile:
+with open('./tracking_reducido_15min.json', 'w') as outfile:
 	json.dump(array_list, outfile)

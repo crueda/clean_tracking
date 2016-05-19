@@ -104,6 +104,9 @@
        var dict_state = [];
        var marker = [];
        var car = null;
+
+        var lat_anterior = 0;
+      var lon_anterior = 0;
     </script>
 
 </head>
@@ -130,8 +133,33 @@
             draggable: false
         });
 
+                  if (lon_anterior==0) {
+                    lon_anterior = lon;
+                  }
+                  if (lat_anterior==0) {
+                    lat_anterior = lat;
+                  }
+                  add_line (lon_anterior, lat_anterior, lon, lat)
+                  lon_anterior = lon;
+                  lat_anterior = lat;
+
+
     }
 
+    function add_line(lon1, lat1, lon2, lat2) {
+
+      var line = new google.maps.Polyline({
+        path: [
+            new google.maps.LatLng(lat1, lon1), 
+            new google.maps.LatLng(lat2, lon2)
+        ],
+        strokeColor: "#0000FF",
+        strokeOpacity: 1.0,
+        strokeWeight: 3,
+        map: map
+      });
+    }
+    
     function loadLayer() {
         $.getJSON( "./tracking_wrc.json", function( data ) {
             $.each( data, function( key, val ) {
