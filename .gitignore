@@ -1,4 +1,3 @@
 gen-json.properties
-tracking.json
-tracking_reducido.json
+*.json
 gen-json.log
