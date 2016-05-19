@@ -53,7 +53,6 @@
 
     <script>
 
-        //SlidingMarker.initializeGlobally();
         var marker, map;
 
         function initialize() {
@@ -67,14 +66,7 @@
             }
             map = new google.maps.Map(document.getElementById('map_canvas'), mapOptions);
 
-            /*
-            var rallyLayer = new google.maps.KmlLayer({
-                url: 'https://dl.dropboxusercontent.com/u/2387761/kml/mexico.kmz',
-                map: map
-              });
-            */
-
-            $.getJSON( "../tracking.json", function( data ) {
+            $.getJSON( "../tracking_reducido.json", function( data ) {
                var items = [];
                $.each( data, function( key, val ) {
                  add (val.geometry.coordinates[0],val.geometry.coordinates[1]);
