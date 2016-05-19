@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+    <meta charset="utf-8">
+    <title>Kyros Correos</title>
+
+    <link href="./css/map.css" rel="stylesheet" />
+    <link href='../img/kyros.png' rel='shortcut icon' type='image/png'> 
+
+    <script src="https://maps.googleapis.com/maps/api/js?sensor=false"></script>
+    <script src="https://code.jquery.com/jquery.min.js"></script>
+    <script src="./vendor/jquery.easing.1.3.js"></script>
+
+
+    <style>
+      html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+      #map {
+        height: 100%;
+      }
+    .controlUI0 {
+      background-color: #fff;
+      height: 0px;
+      border: 0px solid #fff;
+      border-radius: 3px;
+      box-shadow: 0 2px 6px rgba(0,0,0,.3);
+      margin-bottom: 22px;
+      text-align: center;
+    }
+    .controlUI {
+      background-color: #fff;
+      width: 250px;
+      height: 100px;
+      border: 2px solid #fff;
+      border-radius: 3px;
+      box-shadow: 0 2px 6px rgba(0,0,0,.3);
+      margin-bottom: 22px;
+      text-align: center;
+    }
+    .controlText {
+      color: rgb(25,25,25);
+      font-family: Roboto,Arial,sans-serif;
+      font-size: 12px;
+      line-height: 18px;
+      padding-left: 5px;
+      padding-right: 5px;
+    }
+    </style>
+
+    <script>
+
+        var marker, map;
+
+        function initialize() {
+            var myLatlng = new google.maps.LatLng(41.53, -3.66);
+
+            var mapOptions = {
+                zoom: 8,
+                center: myLatlng,
+                //disableDefaultUI: true,
+                mapTypeId: google.maps.MapTypeId.ROADMAP
+            }
+            map = new google.maps.Map(document.getElementById('map_canvas'), mapOptions);
+
+
+
+            $.getJSON( "../tracking_reducido_1000.json", function( data ) {
+                //var items = [];
+                $.each( data, function( key, val ) {
+                  add (val.geometry.coordinates[0],val.geometry.coordinates[1]);
+             });                    
+           });          
+        }
+
+        ///////////////////////////////////////////////////
+
+        $(function () {
+            initialize();
+        });
+
+        function getCarImage() 
+        {
+          return '../img/routePoint_000_0.png'
+        }
+
+    </script>
+
+    <!--script>
+        window.onload = function() { loadTracking()};
+    </script-->
+
+    <script type="text/javascript">    
+       var dict = {};
+       var dict_state = [];
+       var marker = [];
+       var car = null;
+
+
+
+    </script>
+
+</head>
+<body>
+    <div id="map_canvas"></div>
+    <script>
+
+      var lat_anterior = 0;
+      var lon_anterior = 0;
+
+    function add(lon, lat) {
+        var myLatlng = new google.maps.LatLng(lat, lon);
+        var image_src = getCarImage(); 
+
+        image_ancho = 16;
+        image_alto = 16;
+        
+        var icon = new google.maps.MarkerImage(image_src, new google.maps.Size(image_ancho,image_alto), 
+            null, new google.maps.Point(image_ancho/2, image_alto/2), 
+            new google.maps.Size(image_ancho, image_alto));
+             
+        marker['car'] = new google.maps.Marker({
+            position: myLatlng,
+            map: map,
+            icon: image_src,
+            title: 'alias',
+            optimized: false,
+            draggable: false
+        });
+
+                  if (lon_anterior==0) {
+                    lon_anterior = lon;
+                  }
+                  if (lat_anterior==0) {
+                    lat_anterior = lat;
+                  }
+                  add_line (lon_anterior, lat_anterior, lon, lat)
+                  lon_anterior = lon;
+                  lat_anterior = lat;
+
+    }
+
+    function add_line(lon1, lat1, lon2, lat2) {
+
+      var line = new google.maps.Polyline({
+        path: [
+            new google.maps.LatLng(lat1, lon1), 
+            new google.maps.LatLng(lat2, lon2)
+        ],
+        strokeColor: "#0000FF",
+        strokeOpacity: 1.0,
+        strokeWeight: 3,
+        map: map
+      });
+    }
+
+
+
+
+    </script>
+
+</body>
+</html>
